@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bankroll Log</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="page-shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Bankroll Tracker</p>
+                <h1>Log every bet, lesson, and bankroll swing in one place.</h1>
+                <p class="hero-copy">This version runs as a real web app and saves automatically to disk on this machine.</p>
+            </div>
+            <div class="hero-status">
+                <span class="status-dot"></span>
+                <span id="saveStatus">Ready</span>
+            </div>
+        </header>
+
+        <section class="dashboard">
+            <article class="panel metric-panel">
+                <p class="panel-label">Current Bankroll</p>
+                <h2 id="bankrollDisplay">$86.12</h2>
+                <p class="metric-sub">Starting bankroll: <span id="startingBankroll">$86.12</span></p>
+                <div class="progress-block">
+                    <div class="progress-copy">
+                        <span id="goalBankrollLabel">Goal: $600.00</span>
+                        <span id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel metric-panel">
+                <p class="panel-label">Unit Size</p>
+                <h2 id="unitValue">$5.17</h2>
+                <p class="metric-sub">Calculated as 6% of current bankroll.</p>
+                <div class="mini-stats">
+                    <div>
+                        <span class="mini-value" id="todayBets">0</span>
+                        <span class="mini-label">Bets Today</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="todayWins">0</span>
+                        <span class="mini-label">Wins</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="todayLosses">0</span>
+                        <span class="mini-label">Losses</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="panel metric-panel">
+                <p class="panel-label">Overall Performance</p>
+                <div class="mini-stats performance-grid">
+                    <div>
+                        <span class="mini-value" id="totalBets">0</span>
+                        <span class="mini-label">Settled Bets</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="winRate">0%</span>
+                        <span class="mini-label">Win Rate</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="totalProfit">$0.00</span>
+                        <span class="mini-label">Profit / Loss</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="bestStreak">0</span>
+                        <span class="mini-label">Best Streak</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="currentStreak">0</span>
+                        <span class="mini-label">Current Streak</span>
+                    </div>
+                    <div>
+                        <span class="mini-value" id="roi">0%</span>
+                        <span class="mini-label">ROI</span>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="workspace">
+            <article class="panel">
+                <div class="panel-heading">
+                    <div>
+                        <p class="panel-label">Bet Entry</p>
+                        <h3 id="formTitle">Add a new wager</h3>
+                    </div>
+                    <button type="button" class="ghost-button" id="resetFormBtn">Reset Form</button>
+                </div>
+
+                <form id="betForm" class="bet-form">
+                    <label>
+                        <span>Date</span>
+                        <input type="date" id="betDate" required>
+                    </label>
+
+                    <label>
+                        <span>Start Time</span>
+                        <input type="time" id="betStartTime">
+                    </label>
+
+                    <label>
+                        <span>Sport</span>
+                        <select id="betSport" required>
+                            <option value="MLB">MLB</option>
+                            <option value="NBA">NBA</option>
+                            <option value="NHL">NHL</option>
+                            <option value="NFL">NFL</option>
+                            <option value="NCAAB">NCAAB</option>
+                            <option value="NCAAF">NCAAF</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </label>
+
+                    <label class="span-2">
+                        <span>Selection</span>
+                        <input type="text" id="betTeam" placeholder="Brewers ML, Celtics -4.5, Over 8.5" required>
+                    </label>
+
+                    <label>
+                        <span>Bet Type</span>
+                        <select id="betType" required>
+                            <option value="Moneyline">Moneyline</option>
+                            <option value="Spread">Spread</option>
+                            <option value="Over/Under">Over/Under</option>
+                            <option value="Parlay">Parlay</option>
+                            <option value="Prop">Prop</option>
+                            <option value="Futures">Futures</option>
+                        </select>
+                    </label>
+
+                    <label id="parlayLegsWrap" class="hidden-field">
+                        <span>Parlay Legs</span>
+                        <select id="parlayLegs">
+                            <option value="">Select legs</option>
+                            <option value="2">2 Leg</option>
+                            <option value="3">3 Leg</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Stake</span>
+                        <input type="number" id="betStake" step="0.01" min="0" placeholder="5.00" required>
+                    </label>
+
+                    <label>
+                        <span>Odds</span>
+                        <input type="text" id="betOdds" placeholder="+104 or -148" required>
+                    </label>
+
+                    <label>
+                        <span>Result</span>
+                        <select id="betResult" required>
+                            <option value="pending">Pending</option>
+                            <option value="win">Win</option>
+                            <option value="loss">Loss</option>
+                            <option value="push">Push</option>
+                            <option value="cashout">Cash Out</option>
+                        </select>
+                    </label>
+
+                    <label>
+                        <span>Return</span>
+                        <input type="number" id="betReturn" step="0.01" min="0" placeholder="0.00">
+                    </label>
+
+                    <label class="span-2">
+                        <span>Edge / Reason</span>
+                        <select id="betEdge">
+                            <option value="">Select an edge or reason</option>
+                            <option value="Line Value">Line Value</option>
+                            <option value="Matchup Edge">Matchup Edge</option>
+                            <option value="Model Pick">Model Pick</option>
+                            <option value="Injury / News">Injury / News</option>
+                            <option value="Trend / Angle">Trend / Angle</option>
+                            <option value="Live Spot">Live Spot</option>
+                            <option value="Promo / Boost">Promo / Boost</option>
+                            <option value="Hedge">Hedge</option>
+                            <option value="Steam / Market Move">Steam / Market Move</option>
+                            <option value="Custom">Custom</option>
+                        </select>
+                    </label>
+
+                    <label class="span-2 hidden-field" id="betEdgeCustomWrap">
+                        <span>Custom Edge / Reason</span>
+                        <input type="text" id="betEdgeCustom" placeholder="Type a custom edge or reason">
+                    </label>
+
+                    <label class="span-2">
+                        <span>Notes</span>
+                        <textarea id="betNotes" rows="4" placeholder="What made this a bet, and what would you want to remember later?"></textarea>
+                    </label>
+
+                    <div class="form-actions span-2">
+                        <button type="submit" class="primary-button" id="submitBetBtn">Add Bet</button>
+                        <button type="button" class="ghost-button" id="recalcUnitBtn">Recalculate Unit</button>
+                    </div>
+                </form>
+            </article>
+
+            <aside class="side-column">
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="panel-label">Bankroll Settings</p>
+                            <h3>Adjust bankroll amount</h3>
+                        </div>
+                    </div>
+
+                    <form id="bankrollSettingsForm" class="settings-form">
+                        <label>
+                            <span>Current bankroll</span>
+                            <input type="number" id="currentBankrollInput" step="0.01" min="0" placeholder="0.00" required>
+                        </label>
+
+                        <label>
+                            <span>Goal bankroll</span>
+                            <input type="number" id="goalBankrollInput" step="0.01" min="0" placeholder="600.00" required>
+                        </label>
+
+                        <p class="settings-help">Updating the current bankroll recalibrates the tracker without deleting any logged bets.</p>
+
+                        <div class="form-actions">
+                            <button type="submit" class="primary-button">Save Bankroll</button>
+                        </div>
+                    </form>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="panel-label">Journal</p>
+                            <h3>Daily lessons</h3>
+                        </div>
+                    </div>
+
+                    <div class="lesson-form">
+                        <textarea id="lessonInput" rows="5" placeholder="What did you learn today? Keep it honest and short."></textarea>
+                        <button type="button" class="primary-button" id="saveLessonBtn">Save Lesson</button>
+                    </div>
+
+                    <ul class="lesson-list" id="lessonList"></ul>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <p class="panel-label">Data</p>
+                            <h3>Import, export, and reset</h3>
+                        </div>
+                    </div>
+
+                    <form id="syncSettingsForm" class="settings-form">
+                        <label>
+                            <span>Sync API URL</span>
+                            <input type="url" id="syncApiUrl" placeholder="https://your-bankroll-log.up.railway.app">
+                        </label>
+
+                        <label>
+                            <span>Access Token</span>
+                            <input type="password" id="syncAccessToken" placeholder="Paste your sync token">
+                        </label>
+
+                        <p class="settings-help" id="syncModeStatus">Using local desktop storage.</p>
+
+                        <div class="form-actions">
+                            <button type="submit" class="primary-button">Save Sync Settings</button>
+                            <button type="button" class="ghost-button" id="syncNowBtn">Sync Now</button>
+                            <button type="button" class="ghost-button" id="clearSyncSettingsBtn">Use Local Only</button>
+                        </div>
+                    </form>
+
+                    <div class="stack-actions">
+                        <button type="button" class="ghost-button" id="exportBtn">Export JSON</button>
+                        <button type="button" class="ghost-button" id="importBtn">Import JSON</button>
+                        <button type="button" class="danger-button" id="clearAllBtn">Clear All Data</button>
+                    </div>
+
+                    <input type="file" id="fileInput" accept=".json" hidden>
+                </article>
+            </aside>
+        </section>
+
+        <section class="panel">
+            <div class="panel-heading">
+                <div>
+                    <p class="panel-label">History</p>
+                    <h3>Bet log</h3>
+                </div>
+                <div class="filter-row">
+                    <button type="button" class="filter-button active" data-filter="all">All</button>
+                    <button type="button" class="filter-button" data-filter="win">Wins</button>
+                    <button type="button" class="filter-button" data-filter="loss">Losses</button>
+                    <button type="button" class="filter-button" data-filter="pending">Pending</button>
+                    <button type="button" class="filter-button" data-filter="cashout">Cash Outs</button>
+                </div>
+            </div>
+
+            <div class="day-card-list" id="betTableBody"></div>
+        </section>
+    </div>
+
+    <div class="toast" id="notification"></div>
+
+    <script src="/app.js"></script>
+</body>
+</html>

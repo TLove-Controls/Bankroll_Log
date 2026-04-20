@@ -1,0 +1,9 @@
+{
+  "name": "bankroll-log-web-app",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Server-backed bankroll tracking web app",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

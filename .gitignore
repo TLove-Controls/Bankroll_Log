@@ -1,0 +1,12 @@
+server.log
+server.err
+data/bankroll-log.json
+android-app/.gradle/
+android-app/build/
+android-app/app/build/
+android-app/local.properties
+android-app/.idea/
+.idea/
+.vscode/
+Thumbs.db
+.DS_Store

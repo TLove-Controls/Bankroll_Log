@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bet Tracking Notebook</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-input: #1f2940;
+            --accent-green: #00ff88;
+            --accent-green-dim: #00cc6a;
+            --accent-red: #ff4757;
+            --accent-blue: #3498db;
+            --accent-yellow: #f1c40f;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b0;
+            --text-muted: #6b6b80;
+            --border-color: #2a2a40;
+            --shadow: 0 4px 20px rgba(0, 255, 136, 0.1);
+            --glow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0, 255, 136, 0.15);
+        }
+
+        .card-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .bankroll-display {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+            text-shadow: var(--glow);
+            margin-bottom: 8px;
+        }
+
+        .bankroll-sub {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .progress-section {
+            margin-top: 16px;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--bg-input);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            border-radius: 6px;
+            transition: width 0.5s ease;
+            box-shadow: var(--glow);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: 10px;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--accent-green);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stat-value.loss {
+            color: var(--accent-red);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 24px;
+            background: var(--accent-green);
+            border-radius: 2px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-green), var(--accent-green-dim));
+            color: var(--bg-primary);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-green);
+        }
+
+        .btn-danger {
+            background: var(--accent-red);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ff6b7a;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .bet-table-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .bet-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+        }
+
+        .bet-table th,
+        .bet-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .bet-table th {
+            background: var(--bg-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .bet-table tr:hover {
+            background: var(--bg-input);
+        }
+
+        .bet-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .result-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .result-win {
+            background: rgba(0, 255, 136, 0.15);
+            color: var(--accent-green);
+        }
+
+        .result-loss {
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--accent-red);
+        }
+
+        .result-pending {
+            background: rgba(241, 196, 15, 0.15);
+            color: var(--accent-yellow);
+        }
+
+        .unit-display {
+            background: var(--bg-input);
+            padding: 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .unit-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .unit-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-green);
+        }
+
+        .unit-label {
+            color: var(--text-secondary);
+        }
+
+        .lesson-section {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            margin-top: 30px;
+        }
+
+        .lesson-input {
+            width: 100%;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 16px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            margin-bottom: 16px;
+        }
+
+        .lesson-input:focus {
+            outline: none;
+            border-color: var(--accent-green);
+        }
+
+        .lesson-list {
+            list-style: none;
+        }
+
+        .lesson-item {
+            background: var(--bg-input);
+            padding: 14px 18px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lesson-text {
+            flex: 1;
+            color: var(--text-secondary);
+        }
+
+        .lesson-date {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .delete-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-red);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: rgba(255, 71, 87, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-input);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .checkbox-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .checkbox-item input {
+            accent-color: var(--accent-green);
+            width: 18px;
+            height: 18px;
+        }
+
+        .checkbox-item label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+
+        .modal-title {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--accent-green);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .cashout-badge {
+            background: var(--accent-blue);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-left: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+
+            .bankroll-display {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 16px 24px;
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .notification.success {
+            border-color: var(--accent-green);
+        }
+
+        .notification.error {
+            border-color: var(--accent-red);
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            padding: 10px 18px;
+            font-size: 0.9rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quick-action-btn:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-green);
+            color: var(--text-primary);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 16px;
+            font-size: 0.85rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--accent-green);
+            color: var(--bg-primary);
+            border-color: var(--accent-green);
+        }
+
+        .filter-btn:hover:not(.active) {
+            border-color: var(--accent-green);
+        }
+
+        .edit-btn {
+            background: transparent;
+            border: none;
+            color: var(--accent-blue);
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .edit-btn:hover {
+            background: rgba(52, 152, 219, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 Bet Tracking Notebook</h1>
+            <p>Track your bets, save everything automatically, and grow your bankroll.</p>
+        </header>
+
+        <div class="dashboard">
+            <div class="card">
+                <div class="card-title">Current Bankroll</div>
+                <div class="bankroll-display" id="bankrollDisplay">$86.12</div>
+                <div class="bankroll-sub">Starting: <span id="startingBankroll">$86.12</span></div>
+                <div class="progress-section">
+                    <div class="progress-label">
+                        <span id="goalBankrollLabel">Goal: $600</span>
+                        <span id="progressPercent">14%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 14%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Today's Unit Size</div>
+                <div class="unit-display">
+                    <div class="unit-info">
+                        <span class="unit-label">1 Unit =</span>
+                        <span class="unit-value" id="unitValue">$5.17</span>
+                    </div>
+                    <span class="bankroll-sub">(6% of bankroll)</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="todayBets">0</div>
+                        <div class="stat-label">Bets Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="todayWins">0</div>
+                        <div class="stat-label">Wins</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="todayLosses">0</div>
+                        <div class="stat-label">Losses</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Overall Stats</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalBets">0</div>
+                        <div class="stat-label">Total Bets</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="winRate">0%</div>
+                        <div class="stat-label">Win Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalProfit">$0</div>
+                        <div class="stat-label">Total P/L</div>
+                    </div>
+                </div>
+                <div class="stats-grid" style="margin-top: 12px;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="bestStreak">0</div>
+                        <div class="stat-label">Best Win Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Current Streak</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="roi">0%</div>
+                        <div class="stat-label">ROI</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <h2 class="section-title">Add New Bet</h2>
+            <form id="betForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="betDate">Date</label>
+                        <input type="date" id="betDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="betSport">Sport</label>
+                        <select id="betSport" required>
+                            <option value="MLB">MLB</option>
+                            <option value="NHL">NHL</option>
+                            <option value="NBA">NBA</option>
+                            <option value="NFL">NFL</option>
+                            <option value="NCAAF">NCAAF</option>
+                            <option value="NCAAB">NCAAB</option>
+                            <option value="Soccer">Soccer</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="betTeam">Team / Selection</label>
+                        <input type="text" id="betTeam" placeholder="e.g., Brewers ML" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="betType">Bet Type</label>
+                        <select id="betType" required>
+                            <option value="Moneyline">Moneyline</option>
+                            <option value="Spread">Spread</option>
+                            <option value="Over/Under">Over/Under</option>
+                            <option value="Parlay">Parlay</option>
+                            <option value="Prop">Prop</option>
+                            <option value="Futures">Futures</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="betStake">Stake ($)</label>
+                        <input type="number" id="betStake" step="0.01" placeholder="e.g., 5.00" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="betOdds">Odds</label>
+                        <input type="text" id="betOdds" placeholder="e.g., +104 or -148" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="betEdge">Edge / Reason</label>
+                        <input type="text" id="betEdge" placeholder="e.g., Profit boost, Line value">
+                    </div>
+                    <div class="form-group">
+                        <label for="betResult">Result</label>
+                        <select id="betResult" required>
+                            <option value="pending">Pending</option>
+                            <option value="win">Win</option>
+                            <option value="loss">Loss</option>
+                            <option value="push">Push</option>
+                            <option value="cashout">Cash Out</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="betReturn">Return ($)</label>
+                        <input type="number" id="betReturn" step="0.01" placeholder="Filled if Win/Cashout">
+                    </div>
+                </div>
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label for="betNotes">Notes</label>
+                    <textarea id="betNotes" placeholder="Any additional thoughts about this bet..."></textarea>
+                </div>
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary" id="submitBetBtn">➕ Add Bet</button>
+                    <button type="button" class="btn btn-secondary" onclick="calculateUnit()">🔄 Recalculate Unit</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card" style="margin-bottom: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 20px;">
+                <h2 class="section-title" style="margin-bottom: 0;">Bet Log</h2>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="exportData()">📥 Export</button>
+                    <button class="quick-action-btn" onclick="importData()">📤 Import</button>
+                    <button class="quick-action-btn" onclick="clearAllData()">🗑️ Clear All</button>
+                </div>
+            </div>
+            
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="win">Wins</button>
+                <button class="filter-btn" data-filter="loss">Losses</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+                <button class="filter-btn" data-filter="cashout">Cash Outs</button>
+            </div>
+
+            <div class="bet-table-container">
+                <table class="bet-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Sport</th>
+                            <th>Selection</th>
+                            <th>Type</th>
+                            <th>Stake</th>
+                            <th>Odds</th>
+                            <th>Edge</th>
+                            <th>Return</th>
+                            <th>Result</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="betTableBody">
+                        <tr>
+                            <td colspan="10" class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                                <p>No bets yet. Add your first bet above!</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lesson-section">
+            <h2 class="section-title">Daily Lessons</h2>
+            <div class="form-group">
+                <label for="lessonInput">What did you learn today?</label>
+                <textarea id="lessonInput" class="lesson-input" placeholder="e.g., I stuck to my unit size even when nervous..."></textarea>
+            </div>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="checkUnit">
+                    <label for="checkUnit">I stuck to my unit size</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="checkPlan">
+                    <label for="checkPlan">I followed my plan</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="checkEdge">
+                    <label for="checkEdge">I only bet on real edges</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="checkStop">
+                    <label for="checkStop">I respected my stop-loss</label>
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="addLesson()">💾 Save Lesson</button>
+            </div>
+            <ul class="lesson-list" id="lessonList" style="margin-top: 20px;"></ul>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Confirm Delete</h3>
+            <p>Are you sure you want to delete this bet? This action cannot be undone.</p>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="importModal">
+        <div class="modal-content">
+            <h3 class="modal-title">Import Data</h3>
+            <p>Paste your exported JSON data below:</p>
+            <div class="form-group" style="margin-top: 16px;">
+                <textarea id="importData" class="lesson-input" style="min-height: 150px;" placeholder='{"bets": [], "lessons": [], ...}'></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeImportModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="processImport()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileSelect(event)">
+
+    <script>
+        // Data Management
+        let bets = [];
+        let lessons = [];
+        let startingBankroll = 86.12;
+        let goalBankroll = 600;
+        let editingBetId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            resetBetForm();
+            updateUI();
+            setupFilterButtons();
+            setupFormSubmit();
+        });
+
+        function getLocalDateString(date = new Date()) {
+            const timezoneOffset = date.getTimezoneOffset() * 60000;
+            return new Date(date.getTime() - timezoneOffset).toISOString().split('T')[0];
+        }
+
+        function parseAmount(value, fallback = 0) {
+            const amount = parseFloat(value);
+            return Number.isFinite(amount) ? amount : fallback;
+        }
+
+        function normalizeBet(rawBet = {}) {
+            const stake = parseAmount(rawBet.stake);
+            const hasReturnValue = rawBet.return !== undefined && rawBet.return !== null && rawBet.return !== '';
+            const normalizedReturn = hasReturnValue
+                ? parseAmount(rawBet.return)
+                : (rawBet.result === 'push' ? stake : 0);
+
+            return {
+                id: rawBet.id ?? Date.now(),
+                date: rawBet.date || getLocalDateString(),
+                sport: rawBet.sport || 'Other',
+                team: rawBet.team || '',
+                type: rawBet.type || 'Moneyline',
+                stake,
+                odds: rawBet.odds || '',
+                edge: rawBet.edge || '',
+                result: rawBet.result || 'pending',
+                return: normalizedReturn,
+                notes: rawBet.notes || ''
+            };
+        }
+
+        function normalizeLesson(rawLesson = {}) {
+            return {
+                id: rawLesson.id ?? Date.now(),
+                date: rawLesson.date || getLocalDateString(),
+                text: rawLesson.text || '',
+                checkboxes: rawLesson.checkboxes || {}
+            };
+        }
+
+        // Load Data from localStorage
+        function loadData() {
+            try {
+                const storedBets = localStorage.getItem('bets');
+                const storedLessons = localStorage.getItem('lessons');
+                const storedStartingBankroll = localStorage.getItem('startingBankroll');
+
+                if (storedBets) {
+                    bets = JSON.parse(storedBets).map(normalizeBet);
+                }
+                if (storedLessons) {
+                    lessons = JSON.parse(storedLessons).map(normalizeLesson);
+                }
+                if (storedStartingBankroll) {
+                    startingBankroll = parseAmount(storedStartingBankroll, startingBankroll);
+                }
+            } catch (e) {
+                console.error('Error loading data:', e);
+                showNotification('Error loading saved data', 'error');
+            }
+        }
+
+        // Setup Form Submit
+        function setupFormSubmit() {
+            const form = document.getElementById('betForm');
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    const isEditing = editingBetId !== null;
+                    const bet = normalizeBet({
+                        id: editingBetId ?? Date.now(),
+                        date: document.getElementById('betDate').value,
+                        sport: document.getElementById('betSport').value,
+                        team: document.getElementById('betTeam').value,
+                        type: document.getElementById('betType').value,
+                        stake: document.getElementById('betStake').value,
+                        odds: document.getElementById('betOdds').value,
+                        edge: document.getElementById('betEdge').value,
+                        result: document.getElementById('betResult').value,
+                        return: document.getElementById('betReturn').value,
+                        notes: document.getElementById('betNotes').value
+                    });
+
+                    if (isEditing) {
+                        bets = bets.map(existingBet => existingBet.id === editingBetId ? bet : existingBet);
+                    } else {
+                        bets.unshift(bet);
+                    }
+
+                    editingBetId = null;
+                    saveData();
+                    updateUI();
+                    showNotification(isEditing ? 'Bet updated successfully!' : 'Bet added successfully!', 'success');
+                    
+                    // Reset form
+                    resetBetForm();
+                } catch (error) {
+                    console.error('Error adding bet:', error);
+                    showNotification('Error adding bet: ' + error.message, 'error');
+                }
+            });
+        }
+
+        // Update UI
+        function updateUI() {
+            updateBankroll();
+            updateStats();
+            updateBetTable();
+            updateLessons();
+            updateProgress();
+        }
+
+        // Bankroll Calculation
+        function updateBankroll() {
+            let currentBankroll = startingBankroll;
+            
+            bets.forEach(bet => {
+                if (bet.result === 'win' || bet.result === 'cashout') {
+                    currentBankroll = currentBankroll - bet.stake + bet.return;
+                } else if (bet.result === 'push') {
+                    currentBankroll = currentBankroll - bet.stake + (bet.return || bet.stake);
+                } else if (bet.result === 'loss') {
+                    currentBankroll = currentBankroll - bet.stake;
+                }
+            });
+
+            document.getElementById('bankrollDisplay').textContent = `$${currentBankroll.toFixed(2)}`;
+            document.getElementById('startingBankroll').textContent = `$${startingBankroll.toFixed(2)}`;
+            
+            const unitSize = currentBankroll * 0.06;
+            document.getElementById('unitValue').textContent = `$${unitSize.toFixed(2)}`;
+
+            localStorage.setItem('currentBankroll', currentBankroll.toFixed(2));
+        }
+
+        // Stats Calculation
+        function updateStats() {
+            const today = getLocalDateString();
+            const todayBets = bets.filter(b => b.date === today);
+            const settledBets = bets.filter(b => b.result !== 'pending' && b.result !== 'push');
+            const completedBets = bets.filter(b => b.result !== 'pending');
+            const wins = completedBets.filter(b => b.result === 'win' || b.result === 'cashout');
+            
+            document.getElementById('todayBets').textContent = todayBets.length;
+            document.getElementById('todayWins').textContent = todayBets.filter(b => b.result === 'win' || b.result === 'cashout').length;
+            document.getElementById('todayLosses').textContent = todayBets.filter(b => b.result === 'loss').length;
+
+            document.getElementById('totalBets').textContent = completedBets.length;
+            
+            const winRate = settledBets.length > 0 
+                ? ((wins.length / settledBets.length) * 100).toFixed(1) 
+                : 0;
+            document.getElementById('winRate').textContent = `${winRate}%`;
+
+            let totalStaked = 0;
+            let totalReturned = 0;
+            completedBets.forEach(bet => {
+                totalStaked += bet.stake;
+                if (bet.result === 'win' || bet.result === 'cashout') {
+                    totalReturned += bet.return;
+                } else if (bet.result === 'push') {
+                    totalReturned += bet.return || bet.stake;
+                }
+            });
+            const profit = totalReturned - totalStaked;
+            const profitElement = document.getElementById('totalProfit');
+            profitElement.textContent = `${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`;
+            profitElement.className = 'stat-value ' + (profit >= 0 ? '' : 'loss');
+
+            const roi = totalStaked > 0 ? ((profit / totalStaked) * 100) : 0;
+            document.getElementById('roi').textContent = `${roi.toFixed(1)}%`;
+
+            calculateStreaks();
+        }
+
+        function calculateStreaks() {
+            let bestStreak = 0;
+            let tempStreak = 0;
+            let currentStreak = 0;
+            const settledBets = [...bets]
+                .filter(bet => bet.result !== 'pending' && bet.result !== 'push')
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+            
+            for (let bet of settledBets) {
+                if (bet.result === 'win' || bet.result === 'cashout') {
+                    tempStreak++;
+                } else {
+                    if (tempStreak > bestStreak) {
+                        bestStreak = tempStreak;
+                    }
+                    tempStreak = 0;
+                }
+            }
+
+            if (tempStreak > bestStreak) {
+                bestStreak = tempStreak;
+            }
+
+            const mostRecentSettled = [...settledBets].reverse();
+            for (let bet of mostRecentSettled) {
+                if (bet.result === 'win' || bet.result === 'cashout') {
+                    currentStreak++;
+                } else {
+                    break;
+                }
+            }
+
+            document.getElementById('bestStreak').textContent = bestStreak;
+            document.getElementById('currentStreak').textContent = currentStreak;
+        }
+
+        // Progress Bar
+        function updateProgress() {
+            const currentBankroll = parseFloat(document.getElementById('bankrollDisplay').textContent.replace('$', ''));
+            const bankrollRange = goalBankroll - startingBankroll;
+            const progress = bankrollRange === 0 ? 100 : ((currentBankroll - startingBankroll) / bankrollRange) * 100;
+            const clampedProgress = Math.max(0, Math.min(100, progress));
+            
+            document.getElementById('progressFill').style.width = `${clampedProgress}%`;
+            document.getElementById('progressPercent').textContent = `${clampedProgress.toFixed(0)}%`;
+        }
+
+        // Bet Table
+        function updateBetTable(filter = 'all') {
+            const tbody = document.getElementById('betTableBody');
+            let filteredBets = bets;
+
+            if (filter !== 'all') {
+                filteredBets = bets.filter(b => b.result === filter);
+            }
+
+            if (filteredBets.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                            <p>No bets found.</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = filteredBets.map(bet => `
+                <tr>
+                    <td>${bet.date}</td>
+                    <td>${bet.sport}</td>
+                    <td>${bet.team}</td>
+                    <td>${bet.type}</td>
+                    <td>$${bet.stake.toFixed(2)}</td>
+                    <td>${bet.odds}</td>
+                    <td>${bet.edge || '-'}</td>
+                    <td>${bet.return > 0 ? '$' + bet.return.toFixed(2) : '-'}</td>
+                    <td>
+                        <span class="result-badge result-${bet.result === 'win' || bet.result === 'cashout' ? 'win' : bet.result === 'loss' ? 'loss' : 'pending'}">
+                            ${bet.result}${bet.result === 'cashout' ? '<span class="cashout-badge">Cashed</span>' : ''}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="edit-btn" onclick="editBet(${bet.id})">✏️</button>
+                        <button class="delete-btn" onclick="confirmDelete(${bet.id})">🗑️</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Filter Buttons
+        function setupFilterButtons() {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateBetTable(btn.dataset.filter);
+                });
+            });
+        }
+
+        // Edit Bet
+        function editBet(id) {
+            const bet = bets.find(b => b.id === id);
+            if (!bet) return;
+
+            editingBetId = id;
+            document.getElementById('betDate').value = bet.date;
+            document.getElementById('betSport').value = bet.sport;
+            document.getElementById('betTeam').value = bet.team;
+            document.getElementById('betType').value = bet.type;
+            document.getElementById('betStake').value = bet.stake;
+            document.getElementById('betOdds').value = bet.odds;
+            document.getElementById('betEdge').value = bet.edge || '';
+            document.getElementById('betResult').value = bet.result;
+            document.getElementById('betReturn').value = bet.return || '';
+            document.getElementById('betNotes').value = bet.notes || '';
+            document.getElementById('submitBetBtn').textContent = 'Update Bet';
+
+            showNotification('Bet loaded for editing', 'success');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Lessons
+        function addLesson() {
+            const input = document.getElementById('lessonInput');
+            const text = input.value.trim();
+            
+            if (!text) {
+                showNotification('Please enter a lesson', 'error');
+                return;
+            }
+
+            const checkboxes = {
+                unit: document.getElementById('checkUnit').checked,
+                plan: document.getElementById('checkPlan').checked,
+                edge: document.getElementById('checkEdge').checked,
+                stop: document.getElementById('checkStop').checked
+            };
+
+            const lesson = {
+                id: Date.now(),
+                date: getLocalDateString(),
+                text: text,
+                checkboxes: checkboxes
+            };
+
+            lessons.unshift(lesson);
+            saveData();
+            updateLessons();
+            
+            input.value = '';
+            document.querySelectorAll('.checkbox-item input').forEach(cb => cb.checked = false);
+            showNotification('Lesson saved!', 'success');
+        }
+
+        function updateLessons() {
+            const list = document.getElementById('lessonList');
+            
+            if (lessons.length === 0) {
+                list.innerHTML = '<li class="empty-state">No lessons yet. Add your first lesson above!</li>';
+                return;
+            }
+
+            list.innerHTML = lessons.map(lesson => `
+                <li class="lesson-item">
+                    <div>
+                        <span class="lesson-text">${lesson.text}</span>
+                        <span class="lesson-date">${lesson.date}</span>
+                    </div>
+                    <button class="delete-btn" onclick="deleteLesson(${lesson.id})">🗑️</button>
+                </li>
+            `).join('');
+        }
+
+        function deleteLesson(id) {
+            lessons = lessons.filter(l => l.id !== id);
+            saveData();
+            updateLessons();
+            showNotification('Lesson deleted', 'success');
+        }
+
+        // Delete Bet
+        let deleteId = null;
+
+        function confirmDelete(id) {
+            deleteId = id;
+            document.getElementById('confirmModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('active');
+            deleteId = null;
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+            if (deleteId) {
+                if (editingBetId === deleteId) {
+                    resetBetForm();
+                }
+                bets = bets.filter(b => b.id !== deleteId);
+                saveData();
+                updateUI();
+                closeModal();
+                showNotification('Bet deleted', 'success');
+            }
+        });
+
+        // Data Management
+        function saveData() {
+            try {
+                localStorage.setItem('bets', JSON.stringify(bets.map(normalizeBet)));
+                localStorage.setItem('lessons', JSON.stringify(lessons.map(normalizeLesson)));
+                localStorage.setItem('startingBankroll', startingBankroll);
+            } catch (e) {
+                console.error('Error saving data:', e);
+                showNotification('Error saving data', 'error');
+            }
+        }
+
+        function resetBetForm() {
+            const form = document.getElementById('betForm');
+            if (form) {
+                form.reset();
+            }
+
+            editingBetId = null;
+            document.getElementById('betDate').value = getLocalDateString();
+            document.getElementById('submitBetBtn').textContent = 'Add Bet';
+        }
+
+        function calculateUnit() {
+            const currentBankroll = parseFloat(document.getElementById('bankrollDisplay').textContent.replace('$', ''));
+            const unitSize = currentBankroll * 0.06;
+            document.getElementById('unitValue').textContent = `$${unitSize.toFixed(2)}`;
+            showNotification('Unit recalculated!', 'success');
+        }
+
+        function exportData() {
+            const data = {
+                bets,
+                lessons,
+                startingBankroll,
+                exportDate: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bet-tracker-export-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('Data exported!', 'success');
+        }
+
+        function importData() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeImportModal() {
+            document.getElementById('importModal').classList.remove('active');
+            document.getElementById('importData').value = '';
+        }
+
+        function processImport() {
+            try {
+                const jsonText = document.getElementById('importData').value.trim();
+                if (!jsonText) {
+                    showNotification('Please paste JSON data', 'error');
+                    return;
+                }
+
+                const data = JSON.parse(jsonText);
+                
+                if (Array.isArray(data.bets)) bets = data.bets.map(normalizeBet);
+                if (Array.isArray(data.lessons)) lessons = data.lessons.map(normalizeLesson);
+                if (data.startingBankroll !== undefined) {
+                    startingBankroll = parseAmount(data.startingBankroll, startingBankroll);
+                }
+
+                saveData();
+                updateUI();
+                closeImportModal();
+                resetBetForm();
+                showNotification('Data imported successfully!', 'success');
+            } catch (e) {
+                console.error('Import error:', e);
+                showNotification('Invalid JSON data', 'error');
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (Array.isArray(data.bets)) bets = data.bets.map(normalizeBet);
+                    if (Array.isArray(data.lessons)) lessons = data.lessons.map(normalizeLesson);
+                    if (data.startingBankroll !== undefined) {
+                        startingBankroll = parseAmount(data.startingBankroll, startingBankroll);
+                    }
+
+                    saveData();
+                    updateUI();
+                    resetBetForm();
+                    showNotification('File imported successfully!', 'success');
+                } catch (err) {
+                    showNotification('Invalid file format', 'error');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear ALL data? This cannot be undone!')) {
+                localStorage.clear();
+                bets = [];
+                lessons = [];
+                startingBankroll = 86.12;
+                resetBetForm();
+                updateUI();
+                showNotification('All data cleared', 'success');
+            }
+        }
+
+        // Notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modals on outside click
+        document.getElementById('confirmModal').addEventListener('click', (e) => {
+            if (e.target.id === 'confirmModal') {
+                closeModal();
+            }
+        });
+
+        document.getElementById('importModal').addEventListener('click', (e) => {
+            if (e.target.id === 'importModal') {
+                closeImportModal();
+            }
+        });
+    </script>
+</body>
+</html>
